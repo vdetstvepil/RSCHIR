@@ -1,0 +1,38 @@
+services:
+    # Веб-сервер Apache
+    server:
+        container_name: php-apache
+        build: server
+        ports:
+            - 8080:80
+        volumes:
+            - ./server/php/src:/var/www/html/
+        depends_on:
+            - db
+
+    # СУБД
+    db:
+        container_name: mysql
+        image: mysql
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
+            MYSQL_DATABASE: MY_DATABASE
+            MYSQL_USER: MYSQL_USER
+            MYSQL_PASSWORD: MYSQL_PASSWORD
+        volumes:
+            - ./database/init.sql:/docker-entrypoint-initdb.d/1.sql
+        ports:
+            - 3306:3306
+
+    # phpMyAdmin
+    phpmyadmin:
+        container_name: phpmyadmin
+        image: phpmyadmin/phpmyadmin
+        restart: always
+        environment:
+            PMA_HOST: db
+        ports:
+            - 8000:80
+        depends_on:
+            - db
